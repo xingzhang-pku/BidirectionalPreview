@@ -1,0 +1,199 @@
+let abs =
+    \x =>
+        if x < 0 then -x else x
+in
+letrec drop =
+    \err =>
+        \n =>
+            \ls =>
+                case n of
+                    0 => ls
+                    |x => case ls of
+                        [] => err
+                        | y::ys => drop err (x-1) ys
+in
+letrec filter =
+    \f =>
+        \ls =>
+            case ls of
+                [] => []
+                | x::xs =>
+                    if f x then
+                        x :: (filter f xs)
+                    else
+                        filter f xs
+in
+let flip =
+    \f =>
+        \x =>
+            \y =>
+                f y x
+in
+letrec foldl =
+    \f =>
+        \start =>
+            \ls =>
+                case ls of
+                    [] => start
+                    | x :: xs =>
+                        foldl f (f start x) xs
+in
+letrec foldr =
+    \f =>
+        \start =>
+            \ls =>
+                case ls of
+                    [] => start
+                    | x :: xs =>
+                        f x (foldr f start xs)
+in
+let fst =
+    \(a, b) => a
+in
+let head =
+    \err =>
+        \ls =>
+            case ls of
+                [] => err
+                | x::xs => x
+in
+let identity =
+    \x => x
+in
+letrec indexedMap_ =
+    \iter =>
+        \f =>
+            \ls =>
+                case ls of
+                    [] => []
+                    | x::xs =>
+                        (f iter x)::(indexedMap_ (iter+1) f xs)
+in
+let indexedMap = indexedMap_ 0 in
+letrec length =
+    \ls =>
+        case ls of
+            [] => 0
+            | x::xs => 1 + (length xs)
+in
+letrec map =
+    \f =>
+        \ls =>
+            case ls of
+                [] => []
+                | x :: xs => (f x) :: (map f xs)
+in
+let max =
+    \x =>
+        \y =>
+            if x >= y then x else y
+in
+let min =
+    \x =>
+        \y =>
+            if x < y then x else y
+in
+let mod =
+    \a =>
+        \b =>
+            a - (a // b) * b
+in
+letrec nth =
+    \n =>
+        \ls =>
+            case n of
+                0 => (case ls of
+                        [] => "Err 01"
+                        | x::xs => x)
+                | a =>
+                    case ls of
+                    [] => "Err 02"
+                    | x::xs => nth (n-1) xs
+in
+letrec partition =
+    \p =>
+        \ls =>
+            case ls of
+                [] => ([], [])
+                | x :: xs =>
+                    let 
+                        (trueSet, falseSet) =
+                            partition p xs
+                    in
+                    if p x then
+                        (x :: trueSet, falseSet)
+                    else
+                        (trueSet, x :: falseSet)
+in
+letrec range =
+    \i =>
+        \j =>
+            if i < j then
+                i :: (range (i + 1) j)
+            else
+                []
+in
+letrec repeat =
+    \n =>
+        x =>
+            case n of
+                0 => []
+                n1 => x :: (repeat (n1-1) x)
+in
+letrec reverse =
+    \ls =>
+        case ls of
+            [] => []
+            | x :: xs => (reverse xs)++[x]
+in
+let singleton =
+    \x =>
+        [x]
+in
+let snd =
+    \(a, b) => b
+in
+let tail=
+    \err =>
+        \ls =>
+            case ls of
+                [] => err
+                | x::xs => xs
+in
+letrec take =
+    \err =>
+        \n =>
+            \ls =>
+                case n of
+                    0 => []
+                    |x => case ls of
+                        [] => err
+                        | y::ys => y::(take err (x-1) ys)
+in
+letrec unzip =
+    \ls =>
+        case ls of
+            [] => ([], [])
+            |(a, b)::xs =>
+                let (l1, l2) = unzip xs in
+                    (a::l1, b::l2)
+in
+letrec zip =
+    \l1 =>
+        \l2 =>
+            case (l1, l2) of
+                (x1::xs1, x2::xs2) => (x1, x2) :: (zip xs1 xs2)
+                |(x1::xs1, []) => []
+                |([], x2::xs2) => []
+                |([], []) => []
+in
+letrec zipWith =
+    \f =>
+        \l1 =>
+            \l2 =>
+                case (l1, l2) of
+                    (x1::xs1, x2::xs2) => (f x1 x2) :: (zipWith f xs1 xs2)
+                    |(x1::xs1, []) => []
+                    |([], x2::xs2) => []
+                    |([], []) => []
+in
